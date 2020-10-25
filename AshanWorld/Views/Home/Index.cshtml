@@ -1,0 +1,423 @@
+﻿@*@model List<AshanWorld.Models.RankingViewModel>*@
+@model dynamic
+@using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logOffForm" }))
+{@Html.AntiForgeryToken()}
+@{
+    var ValidationLoginErrors = @ViewData["LogErrorMsg"];
+    var ValidationRegisterErrors = @ViewData["RegErrorMsg"];
+    int counter = 0;
+    int counter2 = 0;
+}
+<div class="top-menu">
+    <div id="menu-content" class="top-menu-content">
+        <div class="logo">
+            <p onclick="scrolltodiv('info');">Ashan World</p>
+            <img onclick="scrolltodiv('info');" src="./Images/Haven.png" />
+        </div>
+        <div id="main-menu-div" class="main-menu">
+            <ul id="full-menu-main" class="menu-btns">
+                <li onclick="scrolltodiv('home');"><a>Homepage</a></li>
+                <li onclick="scrolltodiv('info');"><a>Informations</a></li>
+                <li onclick="scrolltodiv('strategy');"><a>Strategy</a></li>
+                <li onclick="scrolltodiv('artifacts');"><a>Artifacts</a></li>
+                <li onclick="scrolltodiv('ranking');"><a>Ranking List</a></li>
+            </ul>
+        </div>
+        <div id="menuAccountDiv" class="account-login">
+            @if (!User.Identity.IsAuthenticated)
+            {
+                <ul id="full-menu-account" class="account-btns">
+                    <li onclick="scrolltodiv('register-login');"><a>Register</a></li>
+                    <li onclick="scrolltodiv('register-login');"><a>Login</a></li>
+                </ul>
+            }
+            else
+            {
+                <ul id="full-menu-account" class="account-btns">
+                    <li id="nickname" class="nickname"></li>
+                    <li onclick="LoggOffUser()"><a>Logout</a></li>
+                </ul>
+            }
+        </div>
+    </div>
+</div>
+<div class="wrapper">
+    <div id="home">
+        <label>Welcome in the Ashan World!</label>
+        <p>
+            This website was created for Heroes of might and magic V fans. You can write here a little bit of strategy.
+            How to prepare to combat and how to prepare to forge in your stronghold.
+            <br>
+            <br>
+            Besides you can find Informations about artifact sets, magic, proposing heroes skills, unit selection-
+            which unit tier is better standard or alternative? Everything you can find in this place.
+            <br>
+            <br>
+            We will create register option soon it allows to log in and then makes possible to be in the ranking.
+            If one of the user confrim your win you can earn points which help you move up the ranks. In one game you
+            can earn 2 points. 1 point for win combat battle and another for win siege battle. Game may end with standard
+            three results: win, draw, lost.
+            <br>
+            <br>
+            Stay tunned, be up-to-date. Will inform about news and website changes.
+        </p>
+    </div>
+    @if (!User.Identity.IsAuthenticated)
+    {
+        <div id="register-login">
+            @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { id = "registerForm", @class = "register", enctype = "multipart/form-data" }))
+            {
+                @Html.AntiForgeryToken()
+                <label>Register now!</label>
+                <div class="register-input-fields">
+                    <div class="r-input-field">
+                        <label>Email</label>
+                        <input id="rEmail" name="Email" />
+                    </div>
+                    <div class="r-input-field">
+                        <label>Nickname</label>
+                        <input id="rNickname" name="Nickname" />
+                    </div>
+                    <div class="r-input-field">
+                        <label>Password</label>
+                        <input id="rPswd" type="password" name="Password" />
+                    </div>
+                    <div class="r-input-field">
+                        <label>Repeat password</label>
+                        <input id="rPswdC" type="password" name="ConfirmPassword" />
+                    </div>
+                </div>
+                <div id="regErrors" class="Reg-error-section">
+                </div>
+
+                <input class="register-submit" type="submit" value="Register" />
+            }
+            @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { id = "loginForm", @class = "login" }))
+            {
+                @Html.AntiForgeryToken()
+                <label>Log in now!</label>
+                <div class="login-input-fields">
+                    <div class="r-input-field">
+                        <label>Username</label>
+                        <input id="lEmail" name="Email" />
+                    </div>
+                    <div class="r-input-field">
+                        <label>Password</label>
+                        <input id="lPswd" type="password" name="Password" />
+                    </div>
+                </div>
+                <div id="logErrors" class="Log-error-section"></div>
+                <input class="login-submit" type="submit" value="Log in" />
+            }
+        </div>
+
+    }
+    <div id="info">
+        <label>Informations about website</label>
+        <p>
+            I have created Ashan World website because I am a huge fan of might and magic world especially heroes of might
+            and magic V. Have a lot of hommV stafs like map, different game eddition and and collectors chest.
+            <br>
+            <br>
+            My free time spend on playing in this mostly with my brother. Despite the passage of years is still unprecedentedly
+            my favourite game.
+        </p>
+    </div>
+    <div id="strategy">
+        <label>Basics strategy</label>
+        <p>This section will be update soon.</p>
+    </div>
+    <div id="artifacts">
+        <label>Artifacts and proposing sets</label>
+        <p>This section will be update soon.</p>
+    </div>
+    <div id="ranking">
+        <label>Ranking list</label>
+        <div class="navigationbar">
+            <div id="ranking-btn" class="rank-btn">Ranking</div>
+            <div id="matches-btn" class="rank-btn">Matches</div>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <div id="manage-btn" class="rank-btn">Manage matches</div>
+            }
+        </div>
+        <div id="rankHeader" class="ranking-header">
+            <select id="rankingDdl" name="ranking">
+                <option value="points">Points</option>
+                <option value="matches">Matches</option>
+                <option value="siege">Siege battles</option>
+                <option value="field">Field battles</option>
+            </select>
+            <select id="ascDescDdl" name="ranking">
+                <option value="descending">Descending</option>
+                <option value="ascending">Ascending</option>
+            </select>
+        </div>
+        <table id="rankTable" class="ranking">
+            <tr>
+                <th>#</th>
+                <th>Player</th>
+                <th>Matches</th>
+                <th>Siege battles</th>
+                <th>Field battles</th>
+                <th>Points</th>
+            </tr>
+            @foreach (var r in Model.ranking)
+            {
+                counter++;
+                <tr>
+                    <td>@counter</td>
+                    <td>@r.Player</td>
+                    <td>@r.MatchesAmount</td>
+                    <td>@r.SiegeBattles</td>
+                    <td>@r.FieldBattles</td>
+                    <td>@r.Points</td>
+                </tr>
+            }
+        </table>
+        <table id="matchTable" class="matches">
+            <tr>
+                <th class="border">#</th>
+                <th class="border">Player</th>
+                <th class="border">Opponent</th>
+                <th class="border">Siege winner</th>
+                <th class="border">Field winner</th>
+                <th class="border">Result</th>
+            </tr>
+            @foreach (var r in Model.matches)
+            {
+                counter2++;
+                if (r.FinalResult == "Win")
+                {
+                    <tr class="win">
+                        <td class="border">@counter2</td>
+                        <td class="border">@r.Player</td>
+                        <td class="border">@r.Opponent</td>
+                        <td class="border">@r.SiegeWinner</td>
+                        <td class="border">@r.FieldWinner</td>
+                        <td class="border">@r.FinalResult</td>
+                    </tr>
+                }
+                else if (r.FinalResult == "Draw")
+                {
+                    <tr class="draw">
+                        <td class="border">@counter2</td>
+                        <td class="border">@r.Player</td>
+                        <td class="border">@r.Opponent</td>
+                        <td class="border">@r.SiegeWinner</td>
+                        <td class="border">@r.FieldWinner</td>
+                        <td class="border">@r.FinalResult</td>
+                    </tr>
+                }
+                else if (r.FinalResult == "Lose")
+                {
+                    <tr class="lose">
+                        <td class="border">@counter2</td>
+                        <td class="border">@r.Player</td>
+                        <td class="border">@r.Opponent</td>
+                        <td class="border">@r.SiegeWinner</td>
+                        <td class="border">@r.FieldWinner</td>
+                        <td class="border">@r.FinalResult</td>
+                    </tr>
+                }
+            }
+        </table>
+        @using (Html.BeginForm("AddMatch", "Home", FormMethod.Post, new { id = "matchForm", @class = "matchForm" }))
+        {
+            <table id="addMatch" class="add-Match">
+                <tr>
+                    <th class="nonBorder">Player</th>
+                    <th class="nonBorder">Opponent</th>
+                    <th class="nonBorder">Siege winner</th>
+                    <th class="nonBorder">Field winner</th>
+                    <th class="nonBorder">Player fraction</th>
+                    <th class="nonBorder">Opponent fraction</th>
+                </tr>
+                <tr>
+                    <td class="nonBorder">
+                        <input id="Player" name="Host" />
+                    </td>
+                    <td class="nonBorder">
+                        <input id="Opponent" name="Guest" />
+                    </td>
+                    <td class="nonBorder">
+                        <select id="siegeWinnerDdl" name="SiegeBattle">
+                            <option value="1">Player</option>
+                            <option value="2">Opponent</option>
+                            <option value="0">Unplayed</option>
+                        </select>
+                    </td>
+                    <td class="nonBorder">
+                        <select id="fieldWinnerDdl" name="FieldBattle">
+                            <option value="1">Player</option>
+                            <option value="2">Opponent</option>
+                            <option value="0">Unplayed</option>
+                        </select>
+                    </td>
+                    <td class="nonBorder">
+                        <select id="hFraction" name="HostFraction">
+                            <option value="Haven">Haven</option>
+                            <option value="Inferno">Inferno</option>
+                            <option value="Necropolis">Necropolis</option>
+                            <option value="Dungeon">Dungeon</option>
+                            <option value="Sylvan">Sylvan</option>
+                            <option value="Academy">Academy</option>
+                            <option value="Fortress">Fortress</option>
+                            <option value="Stronghold">Stronghold</option>
+                        </select>
+                    </td>
+                    <td class="nonBorder">
+                        <select id="gFraction" name="GuestFraction">
+                            <option value="Haven">Haven</option>
+                            <option value="Inferno">Inferno</option>
+                            <option value="Necropolis">Necropolis</option>
+                            <option value="Dungeon">Dungeon</option>
+                            <option value="Sylvan">Sylvan</option>
+                            <option value="Academy">Academy</option>
+                            <option value="Fortress">Fortress</option>
+                            <option value="Stronghold">Stronghold</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <div id="createErrors" class="Create-error-section">
+            </div>
+            <input class="login-submit" type="submit" value="Add new match" />
+        }
+    </div>
+    <div class="sticky-footer">
+        <div class="footer-content">Created by Sebastian Knych</div>
+    </div>
+</div>
+<script type="text/javascript">
+    //check in external js file if user authenticated
+    var model = @Html.Raw(Json.Encode(Model.ranking));
+    var userAuthorized = @User.Identity.IsAuthenticated.ToString().ToLower();
+    var Logerror = @Html.Raw(Json.Encode(ViewData["LogErrorMsg"]));
+    var Regerror = @Html.Raw(Json.Encode(ViewData["RegErrorMsg"]));
+    var accountL = @Html.Raw(Json.Encode(ViewData["accountL"]));
+    var accountR = @Html.Raw(Json.Encode(ViewData["accountR"]));
+    var matchCreateErr = @Html.Raw(Json.Encode(ViewData["MatchErr"]));
+    var ascDescSort = null;
+    //buttons
+    var rankBtn = null;
+    var matchBtn = null;
+    var manageBtn = null;
+    //Ranking sections visibility
+    var rankSection = true;
+    var matchSection = false;
+    var manageSection = false;
+    var rankHeader = null;
+    //User nickname display
+    var nicknameUser = null;
+    var Name = @Html.Raw(Json.Encode(ViewData["Nickname"]));
+    document.addEventListener('DOMContentLoaded', function () {
+        var sortList = document.getElementById('rankingDdl');
+        ascDescSort = document.getElementById('ascDescDdl');
+        rankBtn = document.getElementById("ranking-btn");
+        matchBtn = document.getElementById("matches-btn");
+        manageBtn = document.getElementById("manage-btn");
+        rankHeader = document.getElementById("rankHeader");
+        nicknameUser = document.getElementById('nickname');
+        sortList.onchange =
+    function PickSort() {
+        switch (this.value) {
+            case 'points':
+                SortByPoints();
+                UpdateRankView();
+                break;
+            case 'matches':
+                SortByMatches();
+                UpdateRankView();
+                break;
+            case 'siege':
+                SortBySiege();
+                UpdateRankView();
+                break;
+            case 'field':
+                SortByField();
+                UpdateRankView();
+                break;
+        }
+            }
+        ascDescSort.onchange =
+            function PickOrderSort() {
+                ReverseOrderSort();
+                UpdateRankView();
+            }
+        if (!userAuthorized) {
+            //SortByDropDownValue();
+            if (Logerror != null) {
+                CreateLogErrorMsg();
+            }
+            else if (Regerror != null) {
+
+                CreateRegErrorMsg();
+            }
+        }
+        else {
+            if (matchCreateErr != null) {
+                CreateCreateMatchErrMsg();
+            }
+        }
+        var resolution = window.innerWidth;
+        if (resolution < 801) {
+            document.getElementById("main-menu-div");
+            CheckResolution();
+        }
+        //buttons click handlers
+rankBtn.onclick =
+    function rankTableHandler() {
+        if (!rankSection) {
+            rankSection = true;
+            matchSection = false;
+            manageSection = false;
+            rankHeader.style.display = "block";
+            var rank = document.getElementById('rankTable').style.display = "table";
+            var match = document.getElementById('matchTable').style.display = "none";
+            var manage = document.getElementById('addMatch').style.display = "none";
+            var submit = document.getElementById('matchForm').style.display = "none";
+        }
+    }
+matchBtn.onclick =
+    function matchTableHandler() {
+        debugger;
+        if (!matchSection) {
+            rankSection = false;
+            matchSection = true;
+            manageSection = false;
+            rankHeader.style.display = "none";
+            var rank = document.getElementById('rankTable').style.display = "none";
+            var match = document.getElementById('matchTable').style.display = "table";
+            var manage = document.getElementById('addMatch').style.display = "none";
+            var submit = document.getElementById('matchForm').style.display = "none";
+        }
+    }
+        manageBtn.onclick =
+            function manageTableHandler() {
+                if (!manageSection) {
+                    rankSection = false;
+                    matchSection = false;
+                    manageSection = true;
+                    rankHeader.style.display = "none";
+                    var rank = document.getElementById('rankTable').style.display = "none";
+                    var match = document.getElementById('matchTable').style.display = "none";
+                    var manage = document.getElementById('addMatch').style.display = "table";
+                    var submit = document.getElementById('matchForm').style.display = "block";
+                }
+            };
+        nicknameUser.onmouseover = function ()
+        {
+            var fly = document.createElement('div');
+            fly.textContent = "You're logged as " + Name;
+            fly.className = "flyMessage";
+            fly.id = "nicknameFly";
+            nicknameUser.appendChild(fly);
+        };
+        nicknameUser.onmouseout = function ()
+        {
+            var fly = document.getElementById('nicknameFly');
+            fly.remove();
+        };
+    }, false);
+</script>
